@@ -10,7 +10,7 @@ import { ToastContainer } from 'react-toastify';
 
 const App = () => {
 
-  const url = import.meta.env.VITE_BACKEND_URL;
+  const url = "https://food-delivery-backend-k5qhe.vercel.app";
 
   return (
     <div>
