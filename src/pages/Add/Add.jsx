@@ -23,33 +23,49 @@ const Add = ({url}) => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     const formData = new FormData();
-    formData.append("name",data.name);
-    formData.append("description",data.description);
-    formData.append("price",Number(data.price));
-    formData.append("category",data.category);
-    formData.append("image",image);
-
-    const response = await axios.post(`${url}/api/food/add`,formData,{
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    if(response.data.success)
-    {
-      setData({
-        name:"",
-        description:"",
-        price:"",
-        category:"Salad"
-      })
-      setImage(false);
-      toast.success(response.data.message);
+    formData.append("file", image);
+    formData.append("upload_preset", "First_time_using_cloudinary");
+    formData.append("cloud_name", "demm0gqzw");
+  
+    try {
+      const cloudinaryRes = await fetch(
+        "https://api.cloudinary.com/v1_1/demm0gqzw/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+  
+      const uploadedImage = await cloudinaryRes.json();
+      const imageUrl = uploadedImage.url;
+  
+      console.log("Image uploaded to Cloudinary:", imageUrl);
+  
+      const response = await axios.post(`${url}/api/food/add`, {
+        name: data.name,
+        description: data.description,
+        price: Number(data.price),
+        category: data.category,
+        image: imageUrl,
+      });
+  
+      if (response.data.success) {
+        setData({
+          name: "",
+          description: "",
+          price: "",
+          category: "Salad",
+        });
+        setImage(false);
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (err) {
+      console.error("Upload or submission failed", err);
+      toast.error("Something went wrong.");
     }
-    else
-    {
-      toast.error(response.data.message);
-    }
-  }
+  };
 
   return (
     <div className="add">
